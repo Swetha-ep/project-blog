@@ -1,0 +1,23 @@
+#virtualenv
+blogenv/
+venv/
+env/
+
+
+# Ignore Django migration files
+*/migrations/
+
+
+# Ignore Python compiled files
+__pycache__/
+*.py[cod]
+
+
+# Ignore environment variables files
+.env
+
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
