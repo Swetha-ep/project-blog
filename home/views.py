@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404,redirect
 from .models import Posts
 from django.views.generic import (
     ListView, 
@@ -9,6 +9,10 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.contrib import messages
+from django.utils.safestring import mark_safe
+from django.core.paginator import Paginator
 # Create your views here.
 
 
@@ -69,3 +73,34 @@ class UserPostListView(ListView):
 
 def about(request):
     return render(request,'home/about.html',{'title': 'About'})
+
+
+def search(request):
+    item = request.GET.get('q').strip()
+    if item:
+        posts = Posts.objects.filter(
+            Q(title__contains=item) |
+            Q(author__username__contains=item)
+            )
+        
+        if posts:
+            print(posts)
+        for post in posts:
+            post.title = mark_safe(post.title.replace(item, f"<span style='background-color:yellow;'>{item}</span>"))
+            post.author.username_highlighted = mark_safe(post.author.username.replace(item, f"<span style='background-color:yellow;'>{item}</span>"))
+        if not posts:
+            messages.error(request,"No results found.")
+            return redirect('home-index')
+    else:
+        messages.error(request,"Please enter a search term")
+        return redirect('home-index')
+   
+    # paginator = Paginator(posts, 3)
+    # page_number = request.GET.get('page')
+    # page_obj = paginator.get_page(page_number)
+    context={
+        'posts' : posts,
+        # 'page_obj': page_obj,
+        # 'is_paginated': page_obj.has_other_pages(),
+        }
+    return render(request,'home/search.html',context)
