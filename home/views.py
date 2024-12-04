@@ -1,5 +1,6 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import Posts
+from users.models import Profile
 from django.views.generic import (
     ListView, 
     DetailView,
@@ -68,7 +69,11 @@ class UserPostListView(ListView):
     def get_queryset(self):
         user = get_object_or_404(User,username=self.kwargs.get('username'))
         return Posts.objects.filter(author = user).order_by('-date_posted')
-    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(User, username= self.kwargs.get('username'))
+        context['user_profile']=get_object_or_404(Profile,user=user)
+        return context
 
 
 def about(request):
@@ -76,7 +81,7 @@ def about(request):
 
 
 def search(request):
-    item = request.GET.get('q').strip()
+    item = request.GET.get('q')
     if item:
         posts = Posts.objects.filter(
             Q(title__contains=item) |
@@ -102,5 +107,6 @@ def search(request):
         'posts' : posts,
         # 'page_obj': page_obj,
         # 'is_paginated': page_obj.has_other_pages(),
+        # 'query': item
         }
     return render(request,'home/search.html',context)

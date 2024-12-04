@@ -24,6 +24,7 @@
               <button class="btn btn-outline-dark" type="submit">
                   Update
               </button>
+              <a href="{% url 'user-posts' request.user.username %}" class="btn btn-secondary">See Profile <i class="bi bi-eye"></i></a>
           </div>
       </form>
   </div>

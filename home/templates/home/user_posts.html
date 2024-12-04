@@ -1,7 +1,40 @@
 {% extends 'home/base.html' %}
 
 {% block content %}
-    <h2 class="mb-3">Posts by {{view.kwargs.username}} ({{page_obj.paginator.count}})</h2>
+    {% comment %} <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{user_profile.image.url}}">
+        <div class="media-body">
+        <div class="article-metadata">
+            Profile
+            
+        </div>
+        <p class="article-content mx-auto">username: {{ user_profile.user.username }}</p>
+        <p class="article-content mx-auto">email: {{ user_profile.user.email }}</p>
+        <p class="article-content mx-auto">user bio: {{ user_profile.bio }}</p>
+        </div>
+    </article> {% endcomment %}
+    <div class="container d-flex justify-content-center align-items-center mb-4" style="min-height: 50vh;">
+        <div class="card text-center shadow" style="width: 18rem;">
+            <div class="card-body">
+                <!-- Profile Picture -->
+                <img src="{{user_profile.image.url}}" class="rounded-circle mb-3" alt="Profile Picture" style="width: 120px; height: 120px;">
+                <!-- Username -->
+                <h4 class="card-title mb-1">{{ user_profile.user.username }}</h4>
+                <!-- Email -->
+                <p class="card-subtitle text-muted mb-3">{{ user_profile.user.email }}</p>
+                <!-- Bio -->
+                <p class="card-text">
+                    {{ user_profile.bio }}
+                </p>
+                {% if request.user != user_profile.user %}
+                    <a href="#" class="btn btn-secondary btn-sm">Subscribe <i class="bi bi-bell"></i></a>
+                {%else%}
+                    <a href="{% url 'profile' %}" class="btn btn-secondary btn-sm">Edit <i class="bi bi-pen"></i></a>
+                {%endif%}
+            </div>
+        </div>
+    </div>
+    <h3 class="mb-3">Posts by {{view.kwargs.username}} ({{page_obj.paginator.count}})</h3>
     {% for post in posts %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{post.author.profile.image.url}}">
