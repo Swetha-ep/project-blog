@@ -10,4 +10,5 @@ urlpatterns = [
     path('user/<str:username>/',UserPostListView.as_view(),name='user-posts'),
     path('about/', about, name='home-about'),
     path('search/',search,name='search'),
+    path('subscribed_blogs/',SubscribedPostListView.as_view(),name='user-subscribers-posts'),
 ]

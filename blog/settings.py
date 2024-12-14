@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'home.apps.HomeConfig',
+    'interactions.apps.InteractionsConfig',
     'crispy_forms',
     'ckeditor',
     'crispy_bootstrap4',

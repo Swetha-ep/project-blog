@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.paginator import Paginator
+from interactions.models import Subscription
 # Create your views here.
 
 
@@ -23,6 +24,18 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = 3
+
+
+class SubscribedPostListView(ListView):
+    model = Posts
+    template_name = 'home/subscribed_page.html'
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+    paginate_by = 3
+    def get_queryset(self):
+        subscribers=Subscription.objects.filter(subscriber=self.request.user).values_list('subscribed_to',flat=True)
+        # return Posts.objects.filter(author__in=subscribers).order_by('-date_posted')
+        return super().get_queryset().filter(author__in=subscribers)
 
 
 class PostDetailView(DetailView):
@@ -73,6 +86,9 @@ class UserPostListView(ListView):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username= self.kwargs.get('username'))
         context['user_profile']=get_object_or_404(Profile,user=user)
+        context['is_subscribed']=Subscription.objects.filter(
+            subscriber=self.request.user,subscribed_to=user
+        ).exists()
         return context
 
 
@@ -110,3 +126,4 @@ def search(request):
         # 'query': item
         }
     return render(request,'home/search.html',context)
+

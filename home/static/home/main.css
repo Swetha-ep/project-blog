@@ -88,3 +88,46 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+.author-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+.author-card:hover {
+  transform: scale(1.02);
+}
+.author-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+.bio {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+.unsubscribe-btn {
+  background-color: #ff4d4d;
+  border: none;
+}
+.unsubscribe-btn:hover {
+  background-color: #ff3333;
+}
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.unsubscribe-btn-container {
+  text-align: right;
+  margin-top: 10px;
+}
+@media (max-width: 768px) {
+  .author-card {
+      margin-bottom: 15px;
+  }
+}

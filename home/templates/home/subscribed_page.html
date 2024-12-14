@@ -1,30 +1,16 @@
 {% extends 'home/base.html' %}
+{%load static%}
 
 {% block content %}
-    <div class="container d-flex justify-content-center align-items-center mb-4" style="min-height: 50vh;">
-        <div class="card text-center shadow" style="width: 18rem;">
-            <div class="card-body">
-                <div class="d-flex justify-content-center">
-                    <img src="{{ user_profile.image.url }}" class="rounded-circle mb-3" alt="Profile Picture" style="width: 120px; height: 120px;">
-                </div>
-                <h4 class="card-title mb-1">{{ user_profile.user.username }}</h4>
-                <p class="card-subtitle text-muted mb-3">{{ user_profile.user.email }}</p>
-                <p class="card-text">
-                    {{ user_profile.bio }}
-                </p>
-                {% if request.user != user_profile.user %}
-                    {% if is_subscribed %}
-                        <a href="{% url 'actions-unsubscribe' user_profile.user.id%}" class="btn btn-outline-secondary btn-sm">UnSubscribe <i class="bi bi-bell"></i></a>
-                    {%else%}
-                        <a href="{% url 'actions-subscribe' user_profile.user.id%}" class="btn btn-secondary btn-sm">Subscribe <i class="bi bi-bell"></i></a>
-                    {%endif%}
-                {%else%}
-                    <a href="{% url 'profile' %}" class="btn btn-secondary btn-sm">Edit <i class="bi bi-pen"></i></a>
-                {%endif%}
-            </div>
-        </div>
+<div class="dropdown mb-4">
+    <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img src="{% static 'home/favicon.png' %}" alt="Favicon" style="width: 20px; height: 20px; margin-right: 8px;">
+        Subscribed
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="#">Saved</a>
     </div>
-    <h3 class="mb-3">Posts by {{view.kwargs.username}} ({{page_obj.paginator.count}})</h3>
+  </div>
     {% for post in posts %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{post.author.profile.image.url}}">
@@ -34,7 +20,7 @@
                 <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
             </div>
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content|safe }}</p>
+            <p class="article-content">{{ post.content|safe}}</p>
             </div>
         </article>
     {% endfor %}

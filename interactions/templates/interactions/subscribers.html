@@ -1,0 +1,40 @@
+{%extends 'home/base.html'%}
+
+{%block content%}
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Subscribed Authors</h1>
+    {% if profile %}
+        <div class="list-group">
+            {% for author in profile %}
+                <div class="list-group-item d-flex align-items-center justify-content-between author-card p-3 mb-3">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ author.image.url }}" 
+                             alt="{{ author.user.username }}'s profile picture" 
+                             class="rounded-circle author-image me-3">
+                        <div>
+                            <h5 class="mb-0">{{ author.user.username }}</h5>
+                            <p class="bio text-muted">{{ author.bio|slice:":100" }}</p>
+                            {%if author.bio|length > 100%}
+                                <a href="{% url 'user-posts' author.user.username %}" class="text-primary">
+                                    <small>Read More</small>
+                                </a>
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="unsubscribe-btn-container">
+                        <form method="POST" action="{% url 'actions-unsubscribe' author.user.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm unsubscribe-btn text-white">Unsubscribe</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted text-center">You have not subscribed to any authors yet.</p>
+    {% endif %}
+</div>
+
+    
+{%endblock%}
