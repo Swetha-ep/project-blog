@@ -131,3 +131,11 @@ a.article-title:hover {
       margin-bottom: 15px;
   }
 }
+
+.bookmark{
+  color: #000000;
+}
+
+.bookmark-saved{
+  color: #000000;
+}

@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.paginator import Paginator
-from interactions.models import Subscription
+from interactions.models import Subscription,Saved
 # Create your views here.
 
 
@@ -24,6 +24,14 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = 3
+    def get_context_data(self, **kwargs):
+        context= super().get_context_data(**kwargs)
+        user=self.request.user
+        if user.is_authenticated:
+            saved_posts=Saved.objects.filter(user=user).values_list('posts',flat=True)
+            for post in context['posts']:
+                post.is_saved = post.id in saved_posts
+        return context
 
 
 class SubscribedPostListView(ListView):

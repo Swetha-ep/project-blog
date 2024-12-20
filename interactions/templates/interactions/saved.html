@@ -1,0 +1,48 @@
+{% extends 'home/base.html' %}
+{%load static%}
+
+{% block content %}
+<div class="dropdown mb-4">
+    <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img src="{% static 'home/favicon.png' %}" alt="Favicon" style="width: 20px; height: 20px; margin-right: 8px;">
+        Saved
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a class="dropdown-item" href="{%url 'user-subscribers-posts'%}">Subscribed</a>
+    </div>
+  </div>
+    {% for obj in page_obj %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{obj.posts.author.profile.image.url}}">
+            <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="{% url 'user-posts' obj.posts.author.username %}">{{ obj.posts.author }}</a>
+                <small class="text-muted">{{ obj.posts.date_posted|date:"F d, Y" }}</small>
+            </div>
+            <h2><a class="article-title" href="{% url 'post-detail' obj.posts.id %}">{{ obj.posts.title }}</a></h2>
+            <p class="article-content">{{ obj.posts.content|safe}}</p>
+            </div>
+            {% comment %} {% if post.is_saved %} {% endcomment %}
+                    <a class="bookmark-saved" href="{%url 'actions-save' obj.posts.id %}"><i class="bi bi-bookmark-fill"></i></a>
+            {% comment %} {% else %}
+                    <a class="bookmark" href="{%url 'actions-save' obj.posts.id %}"><i class="bi bi-bookmark"></i></a>
+            {% endif %} {% endcomment %}
+        </article>
+    {% endfor %}
+    {% if page_obj.has_previous %}
+        <a class="btn btn-outline-dark mb-4" href="?page=1">&laquo First</a>
+        <a class="btn btn-outline-dark mb-4" href="?page={{page_obj.previous_page_number}}">Previous</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+        {%if page_obj.number == num%}
+            <a class="btn btn-dark mb-4" href="?page={{num}}">{{num}}</a>
+        {%elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'-3'%}
+            <a class="btn btn-outline-dark mb-4" href="?page={{num}}">{{num}}</a>
+        {%endif%}
+    {%endfor%}
+    {%if page_obj.has_next%}
+        <a class="btn btn-outline-dark mb-4" href="?page={{page_obj.next_page_number}}">Next</a>
+        <a class="btn btn-outline-dark mb-4" href="?page={{page_obj.paginator.num_pages}}">Last &raquo</a>
+    {%endif%}
+{% endblock %}
+
