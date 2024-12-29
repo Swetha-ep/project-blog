@@ -1,5 +1,5 @@
 {% extends 'home/base.html' %}
-
+    
 {% block content %}
     <div class="container d-flex justify-content-center align-items-center mb-4" style="min-height: 50vh;">
         <div class="card text-center shadow" style="width: 18rem;">
@@ -9,6 +9,7 @@
                 </div>
                 <h4 class="card-title mb-1">{{ user_profile.user.username }}</h4>
                 <p class="card-subtitle text-muted mb-3">{{ user_profile.user.email }}</p>
+                <p class="card-subtitle text-muted mb-3">Subscribers: {{ user_profile.user.profile.subscribers_count }}</p>
                 <p class="card-text">
                     {{ user_profile.bio }}
                 </p>
