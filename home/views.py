@@ -10,11 +10,11 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.paginator import Paginator
-from interactions.models import Subscription,Saved
+from interactions.models import *
 # Create your views here.
 
 
@@ -26,11 +26,16 @@ class PostListView(ListView):
     paginate_by = 3
     def get_context_data(self, **kwargs):
         context= super().get_context_data(**kwargs)
+        posts_with_likes = Posts.objects.annotate(total_likes=Count('liked'))
+        for post in context['posts']:
+                post.total_likes = posts_with_likes.get(id=post.id).total_likes
         user=self.request.user
         if user.is_authenticated:
             saved_posts=Saved.objects.filter(user=user).values_list('posts',flat=True)
+            upvote_posts=Like.objects.filter(user=user).values_list('u_posts',flat=True)
             for post in context['posts']:
                 post.is_saved = post.id in saved_posts
+                post.is_liked = post.id in upvote_posts
         return context
 
 
@@ -44,10 +49,30 @@ class SubscribedPostListView(ListView):
         subscribers=Subscription.objects.filter(subscriber=self.request.user).values_list('subscribed_to',flat=True)
         # return Posts.objects.filter(author__in=subscribers).order_by('-date_posted')
         return super().get_queryset().filter(author__in=subscribers)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post_with_likes = Posts.objects.annotate(total_likes=Count('liked'))
+        saved_posts = Saved.objects.filter(user=self.request.user).values_list('posts',flat=True)
+        upvote_posts = Like.objects.filter(user=self.request.user).values_list('u_posts',flat=True)
+        for post in context['posts']:
+            post.is_saved = post.id in saved_posts
+            post.is_liked = post.id in upvote_posts
+            post.total_likes = post_with_likes.get(id=post.id).total_likes
+        return context
+    
 
 
 class PostDetailView(DetailView):
     model = Posts
+    def get_context_data(self, **kwargs):
+        context= super().get_context_data(**kwargs)
+        context['total_likes'] = Like.objects.filter(u_posts=self.object).count()
+        user = self.request.user
+        if user.is_authenticated:
+            context['is_liked'] = Like.objects.filter(user=user,u_posts=self.object).exists()
+            context['is_saved'] = Saved.objects.filter(user=user,posts=self.object).exists()
+        return context
+
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -92,6 +117,15 @@ class UserPostListView(ListView):
         return Posts.objects.filter(author = user).order_by('-date_posted')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        posts_with_likes = Posts.objects.annotate(total_likes=Count('liked'))
+        for post in context['posts']:
+            post.total_likes = posts_with_likes.get(id=post.id).total_likes
+        if self.request.user.is_authenticated:
+            saved_posts=Saved.objects.filter(user=self.request.user).values_list('posts',flat=True)
+            upvote_posts=Like.objects.filter(user=self.request.user).values_list('u_posts',flat=True)
+            for post in context['posts']:
+                post.is_saved = post.id in saved_posts
+                post.is_liked = post.id in upvote_posts
         user = get_object_or_404(User, username= self.kwargs.get('username'))
         context['user_profile']=get_object_or_404(Profile,user=user)
         context['is_subscribed']=Subscription.objects.filter(

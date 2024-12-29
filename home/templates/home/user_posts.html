@@ -36,7 +36,25 @@
             </div>
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content|safe }}</p>
+            {%if post.is_liked %}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
+                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                    </a>
+                {%else%}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </a>
+                {%endif%}
+                    {{post.total_likes}} Upvotes
+                <a><i class="bi bi-chat-text"></i> 0 Thoughts</a>
             </div>
+            {%if request.user != post.author%}
+                {% if post.is_saved %}
+                        <a class="bookmark" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark-fill"></i></a>
+                {% else %}
+                        <a class="bookmark" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark"></i></a>
+                {% endif %}
+            {%endif%}
         </article>
     {% endfor %}
     {% if is_paginated %}

@@ -15,13 +15,31 @@
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{post.author.profile.image.url}}">
             <div class="media-body">
-            <div class="article-metadata">
-                <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
-                <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
+                    <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                </div>
+                <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                <p class="article-content">{{ post.content|safe}}</p>
+                {%if post.is_liked %}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
+                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                    </a>
+                {%else%}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </a>
+                {%endif%}
+                    {{post.total_likes}} Upvotes
+                <a><i class="bi bi-chat-text"></i> 0 Thoughts</a>
             </div>
-            <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content|safe}}</p>
-            </div>
+            {%if request.user != post.author%}
+                {% if post.is_saved %}
+                        <a class="bookmark"title="Unsave" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark-fill"></i></a>
+                {% else %}
+                        <a class="bookmark" title="Save" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark"></i></a>
+                {% endif %}
+            {%endif%}
         </article>
     {% endfor %}
     {% if is_paginated %}

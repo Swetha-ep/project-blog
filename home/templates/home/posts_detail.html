@@ -16,7 +16,25 @@
             </div>
             <h2 class="article-title" >{{ object.title }}</h2>
             <p class="article-content">{{ object.content|safe }}</p>
+            {%if is_liked %}
+                <a class="bookmark" href="{%url 'actions-upvote' object.id%}">
+                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                </a>
+            {%else%}
+                <a class="bookmark" href="{%url 'actions-upvote' object.id%}">
+                    <i class="bi bi-hand-thumbs-up"></i>
+                </a>
+            {%endif%}
+                {{total_likes}} Upvotes
+            <a><i class="bi bi-chat-text"></i> 0 Thoughts</a>
         </div>
+        {%if request.user != post.author%}
+            {% if is_saved %}
+                    <a class="bookmark" title="Unsave" href="{%url 'actions-save' object.id %}"><i class="bi bi-bookmark-fill"></i></a>
+            {% else %}
+                    <a class="bookmark" title="Save" href="{%url 'actions-save' object.id %}"><i class="bi bi-bookmark"></i></a>
+            {% endif %}
+        {%endif%}
     </article>
 {% endblock %}
 

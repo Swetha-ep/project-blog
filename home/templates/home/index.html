@@ -22,23 +22,24 @@
                 </div>
                 <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content|safe}}</p>
-                {% comment %} {%%} {% endcomment %}
-                    <a>
-                        <i class="bi bi-hand-thumbs-up"></i>
-                    </a>
-                    <a>
+                {%if post.is_liked %}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
                         <i class="bi bi-hand-thumbs-up-fill"></i>
                     </a>
-                    0Upvotes
-                {% comment %} {%%} {% endcomment %}
+                {%else%}
+                    <a class="bookmark" href="{%url 'actions-upvote' post.id%}">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                    </a>
+                {%endif%}
+                    {{post.total_likes}} Upvotes
                 <a><i class="bi bi-chat-text"></i> 0 Thoughts</a>
             </div>
                                    
             {%if request.user != post.author%}
                 {% if post.is_saved %}
-                        <a class="bookmark-saved" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark-fill"></i></a>
+                        <a class="bookmark"title="Unsave" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark-fill"></i></a>
                 {% else %}
-                        <a class="bookmark" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark"></i></a>
+                        <a class="bookmark" title="Save" href="{%url 'actions-save' post.id %}"><i class="bi bi-bookmark"></i></a>
                 {% endif %}
             {%endif%}
                 
