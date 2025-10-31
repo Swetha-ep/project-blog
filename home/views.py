@@ -14,6 +14,7 @@ from django.db.models import Q,Count
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from interactions.models import *
 # Create your views here.
 
@@ -39,12 +40,14 @@ class PostListView(ListView):
         return context
 
 
-class SubscribedPostListView(ListView):
+class SubscribedPostListView(LoginRequiredMixin, ListView):
     model = Posts
     template_name = 'home/subscribed_page.html'
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = 3
+    login_url = 'login' 
+    redirect_field_name = 'next'
     def get_queryset(self):
         subscribers=Subscription.objects.filter(subscriber=self.request.user).values_list('subscribed_to',flat=True)
         # return Posts.objects.filter(author__in=subscribers).order_by('-date_posted')
@@ -126,11 +129,18 @@ class UserPostListView(ListView):
             for post in context['posts']:
                 post.is_saved = post.id in saved_posts
                 post.is_liked = post.id in upvote_posts
+        else:
+            for post in context['posts']:
+                post.is_saved = False
+                post.is_liked = False
         user = get_object_or_404(User, username= self.kwargs.get('username'))
         context['user_profile']=get_object_or_404(Profile,user=user)
-        context['is_subscribed']=Subscription.objects.filter(
-            subscriber=self.request.user,subscribed_to=user
-        ).exists()
+        if self.request.user.is_authenticated:
+            context['is_subscribed'] = Subscription.objects.filter(
+                subscriber=self.request.user, subscribed_to=user
+            ).exists()
+        else:
+            context['is_subscribed'] = False
         return context
 
 
@@ -157,15 +167,9 @@ def search(request):
     else:
         messages.error(request,"Please enter a search term")
         return redirect('home-index')
-   
-    # paginator = Paginator(posts, 3)
-    # page_number = request.GET.get('page')
-    # page_obj = paginator.get_page(page_number)
+
     context={
         'posts' : posts,
-        # 'page_obj': page_obj,
-        # 'is_paginated': page_obj.has_other_pages(),
-        # 'query': item
         }
     return render(request,'home/search.html',context)
 
